@@ -23,68 +23,144 @@
         const HALF_LONG_AXIS = 14960;
         const HALF_SHORT_AXIS = 14958;
         const ERATH_ORBIT_TIME = 133.6;
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 1000);
-        camera.position.z = 400;
-        const renderer = new THREE.WebGLRenderer();
+        const PERIGEE_DISTANCE = 1448;
+        const APOGEE_DISTANCE = 1624;
+        const HALF_LONG_AXIS_OF_MOON = 1536;
+        const HALF_SHORT_AXIS_OF_MOON = 1532;
+        const MOON_ORBIT_TIME = 10;
+        const scene = new THREE.Scene();//初始化场景
+        const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 2000);//初始化摄像机
+        camera.position.z = 1200;//设置摄像机位置
+        const renderer = new THREE.WebGLRenderer({antialias: true});//初始化渲染器，开启抗锯齿
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setClearColor(0xffffff)
-        const orbitControls = new OrbitControls(camera, renderer.domElement);
+        const orbitControls = new OrbitControls(camera, renderer.domElement);//初始化摄像机轨道控制
         document.body.appendChild(renderer.domElement);
 
-        const ambient_light = new THREE.AmbientLight('white', 0.4);
+        const ambient_light = new THREE.AmbientLight('white', 0.4);//设置环境光
         scene.add(ambient_light);
 
-        const point_light = new THREE.PointLight('white');
+        const point_light = new THREE.PointLight('white');//设置从太阳发出的点光源
         point_light.intensity = 3;
         point_light.position.set(0, 0, 0);
-        scene.add(point_light)
+        scene.add(point_light);
 
+        //创建球体函数
         function createSphereGeometry(options){
             const geometry = new THREE.SphereGeometry(options.radius);
             const material = new THREE.MeshLambertMaterial({ color: options.color });
             const sphere = new THREE.Mesh(geometry, material);
             sphere.position.add(new THREE.Vector3(...options.position));
             return sphere;
-        }
+        };
 
+        //创建太阳
         const sun = createSphereGeometry({
             color: 'red',
-            radius: 20,
+            radius: 40,
             position: [0, 0, 0]
-        })
+        });
 
+        //创建地球
         const earth = createSphereGeometry({
             color: 'blue',
+            radius: 16,
+            position: [300, 0, 0]
+        });
+
+        //创建月球
+        const moon = createSphereGeometry({
+            color: 'gray',
             radius: 8,
-            position: [100, 0, 0]
-        })
+            position: [332, 0, 0]
+        });
 
         scene.add(sun);
         scene.add(earth);
+        scene.add(moon);
 
+        //创建曲线函数
+        function createCurveGeometry(options){
+            const points = options.orbit.getPoints(100);
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({color: options.color});
+            const curve = new THREE.Line(geometry, material);
+            curve.position.add(new THREE.Vector3(...options.position));
+            return curve;
+        }
+
+        //地球轨道
         const earth_orbit = new THREE.EllipseCurve(
-            100*(1 - HALF_LONG_AXIS / APHELION_DISTANCE),
+            300*(1 - HALF_LONG_AXIS / APHELION_DISTANCE),
             0,
-            100 * HALF_LONG_AXIS / APHELION_DISTANCE,
-            100 * HALF_SHORT_AXIS / APHELION_DISTANCE,
+            300 * HALF_LONG_AXIS / APHELION_DISTANCE,
+            300 * HALF_SHORT_AXIS / APHELION_DISTANCE,
             0,
             2 * Math.PI,
             false,
             0
-            );
+        );
 
+        //2d月球轨道
+        const moon_orbit_2d = new THREE.EllipseCurve(
+            300*(APOGEE_DISTANCE / APHELION_DISTANCE - HALF_LONG_AXIS_OF_MOON / APHELION_DISTANCE),
+            0,
+            300 * HALF_LONG_AXIS_OF_MOON / APHELION_DISTANCE,
+            300 * HALF_SHORT_AXIS_OF_MOON / APHELION_DISTANCE,
+            0,
+            2 * Math.PI,
+            false,
+            0
+        );
+
+        //地球轨道曲线实体
+        const earth_orbit_object = createCurveGeometry({
+            orbit: earth_orbit,
+            color: 'gray',
+            position: [0, 0, 0]
+        });
+
+        //月球轨道曲线实体
+        const moon_orbit_object = createCurveGeometry({
+            orbit: moon_orbit_2d,
+            color: 'gray',
+            position: [0, 0, 0]
+        });
+
+        //旋转月球轨道
+        moon_orbit_object.rotateY(5.9 / 90 * Math.PI);
+
+        scene.add(earth_orbit_object);
+        scene.add(moon_orbit_object);
+
+        moon_orbit_object.updateMatrixWorld();//更新坐标变换矩阵
+        const array = moon_orbit_object.geometry.attributes.position.array;//得到月球轨道坐标
+        let moon_orbit_points = [];//月球轨道点集
+        for(let i = 0; i < moon_orbit_object.geometry.attributes.position.count; i++){
+            let vector = new THREE.Vector3(array[i*3], array[i*3 + 1], array[i*3 + 2]);
+            vector.applyMatrix4(moon_orbit_object.matrixWorld);//从局部坐标变换到世界坐标
+            moon_orbit_points.push(vector);
+        }
+        const moon_orbit = new THREE.CatmullRomCurve3(moon_orbit_points);//3d月球轨道
+        moon_orbit_object.position.set(300, 0, 0);          
+
+        //动画
         const animate = function () {
             let time = Math.floor(performance.now());
             time = time / 1000;
             let t = time % ERATH_ORBIT_TIME / ERATH_ORBIT_TIME;
-            earth_orbit.getPointAt(t,earth.position);
+            let t_moon = time % MOON_ORBIT_TIME / MOON_ORBIT_TIME;
+            let earth_position_2d = earth_orbit.getPointAt(t);
+            let earth_position = new THREE.Vector3(earth_position_2d.x, earth_position_2d.y, 0);
+            earth.position.copy(earth_position);//更新地球坐标
+            moon_orbit_object.position.copy(earth_position);//更新月球轨道坐标
+            moon.position.addVectors(earth_position, moon_orbit.getPointAt(t_moon));//更新月球坐标
             requestAnimationFrame(animate);
             renderer.render(scene, camera);
         };
         animate();
 
-      </script>
+    </script>
 </body>
 
 </html>
