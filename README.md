@@ -8,10 +8,21 @@ using threejs
 故需要以下两种解决方案之一
 
 1、
-
 在vscode中下载live server插件，在vscode视图中右键单击index.html文件，选择open with live server打开。
 
 2、
-
 找到chrome.exe的目录文件夹，打开cmd，输入chrome.exe --disable-web-security --user-data-dir=D:\MyChromeUserData打开chrome，得到一个关闭了同源策略的chrome页面，
 再打开本地index.html。此举会在D盘中产生一个存放chrome用户信息的MyChromeUserData文件夹。
+
+为了便于观察，以地球公转轨道为基
+
+月球公转轨道放大了40倍
+
+太阳直径放大了29倍
+
+地球直径放大了1252倍
+
+月球直径放大了2297倍
+
+此外，太阳、地球、月球赤道与地球公转轨道夹角均放大了4倍
+
