@@ -1,14 +1,15 @@
-html,
 body {
   background-color: #121215;
 }
 
 .solar-system {
-  position: relative;
-  width: 780px;
-  height: 780px;
-  margin: auto;
-  overflow: hidden;
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  margin:auto;
+  perspective:1000px;  
 }
 
 .orbit {
@@ -93,8 +94,8 @@ body {
 }
 
 .earth-spin {
-  animation: spin-right 36.5s linear infinite;
+  animation: spin-right 30s linear infinite;
 }
 .moon-spin {
-  animation: spin-right 3s linear infinite;
+  animation: spin-right 5s linear infinite;
 }
