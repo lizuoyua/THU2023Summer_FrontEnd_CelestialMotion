@@ -18,18 +18,25 @@
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        const SUN_TIME = 24.47;
+        const EARTH_TIME = 1;
+        const MOON_TIME = 27.32;
+        const SUN_ANGLE = 7.25;
+        const EARTH_ANGLE = 23.26;
+        const MOON_ANGLE = 1.54;
+        const MOON_ORBIT_ANGLE = 5.09;
+        const ERATH_ORBIT_TIME = 365;
+        const MOON_ORBIT_TIME = 27.32;
         const PERIHELION_DISTANCE = 14709;
         const APHELION_DISTANCE = 15210;
         const HALF_LONG_AXIS = 14960;
         const HALF_SHORT_AXIS = 14958;
-        const ERATH_ORBIT_TIME = 133.6;
         const PERIGEE_DISTANCE = 1448;
         const APOGEE_DISTANCE = 1624;
         const HALF_LONG_AXIS_OF_MOON = 1536;
         const HALF_SHORT_AXIS_OF_MOON = 1532;
-        const MOON_ORBIT_TIME = 10;
         const scene = new THREE.Scene();//初始化场景
-        const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 2000);//初始化摄像机
+        const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1 ,10000);//初始化摄像机
         camera.position.z = 1200;//设置摄像机位置
         const renderer = new THREE.WebGLRenderer({antialias: true});//初始化渲染器，开启抗锯齿
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -128,7 +135,7 @@
         });
 
         //旋转月球轨道
-        moon_orbit_object.rotateY(5.9 / 90 * Math.PI);
+        moon_orbit_object.rotateY(MOON_ORBIT_ANGLE / 45 * Math.PI);
 
         scene.add(earth_orbit_object);
         scene.add(moon_orbit_object);
@@ -142,19 +149,26 @@
             moon_orbit_points.push(vector);
         }
         const moon_orbit = new THREE.CatmullRomCurve3(moon_orbit_points);//3d月球轨道
-        moon_orbit_object.position.set(300, 0, 0);          
+        moon_orbit_object.position.set(300, 0, 0);
+
+        const sun_axis = new THREE.Vector3(Math.sin(SUN_ANGLE / 45 * Math.PI), 0,Math.cos(SUN_ANGLE / 45 * Math.PI));//太阳自转轴
+        const earth_axis = new THREE.Vector3(Math.sin(EARTH_ANGLE / 45 * Math.PI), 0,Math.cos(EARTH_ANGLE / 45 * Math.PI));//地球自转轴
+        const moon_axis = new THREE.Vector3(Math.sin(MOON_ANGLE / 45 * Math.PI), 0,Math.cos(MOON_ANGLE / 45 * Math.PI));//月球自转轴
 
         //动画
         const animate = function () {
             let time = Math.floor(performance.now());
             time = time / 1000;
-            let t = time % ERATH_ORBIT_TIME / ERATH_ORBIT_TIME;
-            let t_moon = time % MOON_ORBIT_TIME / MOON_ORBIT_TIME;
-            let earth_position_2d = earth_orbit.getPointAt(t);
+            let t_earth_orbit = time % ERATH_ORBIT_TIME / ERATH_ORBIT_TIME;
+            let t_moon_orbit = time % MOON_ORBIT_TIME / MOON_ORBIT_TIME;
+            let earth_position_2d = earth_orbit.getPointAt(t_earth_orbit);
             let earth_position = new THREE.Vector3(earth_position_2d.x, earth_position_2d.y, 0);
             earth.position.copy(earth_position);//更新地球坐标
             moon_orbit_object.position.copy(earth_position);//更新月球轨道坐标
-            moon.position.addVectors(earth_position, moon_orbit.getPointAt(t_moon));//更新月球坐标
+            moon.position.addVectors(earth_position, moon_orbit.getPointAt(t_moon_orbit));//更新月球坐标
+            sun.setRotationFromAxisAngle(sun_axis, 2*Math.PI *(time % SUN_TIME) / SUN_TIME);//更新太阳自转角度
+            earth.setRotationFromAxisAngle(earth_axis, 2*Math.PI *(time % EARTH_TIME) / EARTH_TIME);//更新地球自转角度
+            moon.setRotationFromAxisAngle(moon_axis, 2*Math.PI *(time % MOON_TIME) / MOON_TIME);//更新月球自转角度
             requestAnimationFrame(animate);
             renderer.render(scene, camera);
         };
