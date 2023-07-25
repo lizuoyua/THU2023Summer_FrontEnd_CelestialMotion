@@ -3,7 +3,9 @@
 
 <head>
     <title>日月地轨道展示</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./index.css"></script>
     <script type="importmap">
         {
             "imports": {
@@ -15,6 +17,11 @@
 </head>
 
 <body>
+    <select id="view_method">
+        <option value="front_view">俯视图</option>
+        <option value="side_view">侧视图</option>
+        <option value="3D">3D</option>
+    </select>
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -37,7 +44,7 @@
         const HALF_SHORT_AXIS_OF_MOON = 1532;
         const scene = new THREE.Scene();//初始化场景
         const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1 ,10000);//初始化摄像机
-        camera.position.z = 1200;//设置摄像机位置
+        camera.position.z = 1400;//设置摄像机位置
         const renderer = new THREE.WebGLRenderer({antialias: true});//初始化渲染器，开启抗锯齿
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setClearColor(0xffffff)
@@ -173,6 +180,28 @@
             renderer.render(scene, camera);
         };
         animate();
+
+        //初始化视图
+        orbitControls.enabled = false;
+
+        const select_view_method_element = document.querySelector('#view_method');
+        
+        //添加视图选择监听
+        select_view_method_element.addEventListener('change', (event) => {
+            if(event.target.value == 'front_view'){
+                camera.position.set(0, 0, 1400);
+                camera.lookAt(new THREE.Vector3(0, 0, 0));
+                orbitControls.enabled = false;
+            }
+            else if(event.target.value == 'side_view'){
+                camera.position.set(0, 1400, 0);
+                camera.lookAt(new THREE.Vector3(0, 0, 0));
+                orbitControls.enabled = false;
+            }
+            else{
+                orbitControls.enabled = true;
+            }
+        })
 
     </script>
 </body>
