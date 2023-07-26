@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>日月地轨道展示</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="./index.css"></script>
     <script type="importmap">
         {
             "imports": {
@@ -28,20 +26,27 @@
         const SUN_TIME = 24.47;
         const EARTH_TIME = 1;
         const MOON_TIME = 27.32;
+
         const SUN_ANGLE = 7.25;
         const EARTH_ANGLE = 23.26;
         const MOON_ANGLE = 1.54;
         const MOON_ORBIT_ANGLE = 5.09;
-        const ERATH_ORBIT_TIME = 365;
+
+        const EARTH_ORBIT_TIME = 365;
         const MOON_ORBIT_TIME = 27.32;
+
         const PERIHELION_DISTANCE = 14709;
         const APHELION_DISTANCE = 15210;
+
         const HALF_LONG_AXIS = 14960;
         const HALF_SHORT_AXIS = 14958;
+
         const PERIGEE_DISTANCE = 1448;
         const APOGEE_DISTANCE = 1624;
+
         const HALF_LONG_AXIS_OF_MOON = 1536;
         const HALF_SHORT_AXIS_OF_MOON = 1532;
+
         const scene = new THREE.Scene();//初始化场景
         const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1 ,10000);//初始化摄像机
         camera.position.z = 1400;//设置摄像机位置
@@ -59,6 +64,12 @@
         point_light.position.set(0, 0, 0);
         scene.add(point_light);
 
+        const loader = new THREE.TextureLoader();
+        
+        //// 加载图像作为背景
+        const backgroundImage = loader.load('./images/galaxy.jpg');
+        scene.background = backgroundImage;
+
         //创建球体函数
         function createSphereGeometry(options){
             const geometry = new THREE.SphereGeometry(options.radius);
@@ -70,24 +81,36 @@
 
         //创建太阳
         const sun = createSphereGeometry({
-            color: 'red',
             radius: 40,
             position: [0, 0, 0]
         });
 
+    // 加载太阳背景图像
+    const sunBackgroundTexture = loader.load('./images/sun.jpeg');
+    const sunMaterial = new THREE.MeshBasicMaterial({ map: sunBackgroundTexture });
+    sun.material = sunMaterial
+
         //创建地球
         const earth = createSphereGeometry({
-            color: 'blue',
             radius: 16,
             position: [300, 0, 0]
         });
-
+    
+    // 加载地球背景图像
+    const earthBackgroundTexture = loader.load('./images/earth.jpg'); 
+    const earthMaterial = new THREE.MeshBasicMaterial({ map: earthBackgroundTexture });
+    earth.material = earthMaterial
+    
         //创建月球
         const moon = createSphereGeometry({
-            color: 'gray',
             radius: 8,
             position: [332, 0, 0]
         });
+
+    // 加载月球背景图像
+    const moonBackgroundTexture = loader.load('./images/moon.jpg'); 
+    const moonMaterial = new THREE.MeshBasicMaterial({ map: moonBackgroundTexture });
+    moon.material = moonMaterial
 
         scene.add(sun);
         scene.add(earth);
@@ -159,14 +182,14 @@
         moon_orbit_object.position.set(300, 0, 0);
 
         const sun_axis = new THREE.Vector3(Math.sin(SUN_ANGLE / 45 * Math.PI), 0,Math.cos(SUN_ANGLE / 45 * Math.PI));//太阳自转轴
-        const earth_axis = new THREE.Vector3(Math.sin(EARTH_ANGLE / 45 * Math.PI), 0,Math.cos(EARTH_ANGLE / 45 * Math.PI));//地球自转轴
+        const earth_axis = new THREE.Vector3(Math.sin(EARTH_ANGLE / 45 * Math.PI), 0 ,Math.cos(EARTH_ANGLE / 45 * Math.PI));//地球自转轴
         const moon_axis = new THREE.Vector3(Math.sin(MOON_ANGLE / 45 * Math.PI), 0,Math.cos(MOON_ANGLE / 45 * Math.PI));//月球自转轴
 
         //动画
         const animate = function () {
             let time = Math.floor(performance.now());
-            time = time / 1000;
-            let t_earth_orbit = time % ERATH_ORBIT_TIME / ERATH_ORBIT_TIME;
+            time = time*0.0005;
+            let t_earth_orbit = time % EARTH_ORBIT_TIME / EARTH_ORBIT_TIME;
             let t_moon_orbit = time % MOON_ORBIT_TIME / MOON_ORBIT_TIME;
             let earth_position_2d = earth_orbit.getPointAt(t_earth_orbit);
             let earth_position = new THREE.Vector3(earth_position_2d.x, earth_position_2d.y, 0);
