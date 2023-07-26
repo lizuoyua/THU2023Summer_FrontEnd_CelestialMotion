@@ -55,6 +55,7 @@
         renderer.setClearColor(0xffffff)
         const orbitControls = new OrbitControls(camera, renderer.domElement);//初始化摄像机轨道控制
         document.body.appendChild(renderer.domElement);
+        const loader = new THREE.TextureLoader();//初始化加载器
 
         const ambient_light = new THREE.AmbientLight('white', 0.4);//设置环境光
         scene.add(ambient_light);
@@ -63,8 +64,6 @@
         point_light.intensity = 3;
         point_light.position.set(0, 0, 0);
         scene.add(point_light);
-
-        const loader = new THREE.TextureLoader();
         
         //// 加载图像作为背景
         const backgroundImage = loader.load('./images/galaxy.jpg');
@@ -73,44 +72,43 @@
         //创建球体函数
         function createSphereGeometry(options){
             const geometry = new THREE.SphereGeometry(options.radius);
-            const material = new THREE.MeshLambertMaterial({ color: options.color });
-            const sphere = new THREE.Mesh(geometry, material);
+            const sphere = new THREE.Mesh(geometry, options.material);
             sphere.position.add(new THREE.Vector3(...options.position));
             return sphere;
         };
 
+        // 加载太阳背景图像
+        const sun_backgroud_texture = loader.load('./images/sun.jpeg');
+        const sun_material = new THREE.MeshBasicMaterial({ map: sun_backgroud_texture });
+
         //创建太阳
         const sun = createSphereGeometry({
             radius: 40,
+            material: sun_material,
             position: [0, 0, 0]
         });
 
-    // 加载太阳背景图像
-    const sunBackgroundTexture = loader.load('./images/sun.jpeg');
-    const sunMaterial = new THREE.MeshBasicMaterial({ map: sunBackgroundTexture });
-    sun.material = sunMaterial
+        // 加载地球背景图像
+        const earth_backgroud_texture = loader.load('./images/earth.jpg'); 
+        const earth_material = new THREE.MeshBasicMaterial({ map: earth_backgroud_texture });
 
         //创建地球
         const earth = createSphereGeometry({
             radius: 16,
+            material: earth_material,
             position: [300, 0, 0]
         });
-    
-    // 加载地球背景图像
-    const earthBackgroundTexture = loader.load('./images/earth.jpg'); 
-    const earthMaterial = new THREE.MeshBasicMaterial({ map: earthBackgroundTexture });
-    earth.material = earthMaterial
-    
+
+        // 加载月球背景图像
+        const moon_backgroud_texture = loader.load('./images/moon.jpg'); 
+        const moon_material = new THREE.MeshBasicMaterial({ map: moon_backgroud_texture });
+
         //创建月球
         const moon = createSphereGeometry({
             radius: 8,
+            material: moon_material,
             position: [332, 0, 0]
         });
-
-    // 加载月球背景图像
-    const moonBackgroundTexture = loader.load('./images/moon.jpg'); 
-    const moonMaterial = new THREE.MeshBasicMaterial({ map: moonBackgroundTexture });
-    moon.material = moonMaterial
 
         scene.add(sun);
         scene.add(earth);
@@ -165,7 +163,7 @@
         });
 
         //旋转月球轨道
-        moon_orbit_object.rotateY(MOON_ORBIT_ANGLE / 45 * Math.PI);
+        moon_orbit_object.rotateY(MOON_ORBIT_ANGLE / 180 * Math.PI);
 
         scene.add(earth_orbit_object);
         scene.add(moon_orbit_object);
@@ -181,9 +179,9 @@
         const moon_orbit = new THREE.CatmullRomCurve3(moon_orbit_points);//3d月球轨道
         moon_orbit_object.position.set(300, 0, 0);
 
-        const sun_axis = new THREE.Vector3(Math.sin(SUN_ANGLE / 45 * Math.PI), 0,Math.cos(SUN_ANGLE / 45 * Math.PI));//太阳自转轴
-        const earth_axis = new THREE.Vector3(Math.sin(EARTH_ANGLE / 45 * Math.PI), 0 ,Math.cos(EARTH_ANGLE / 45 * Math.PI));//地球自转轴
-        const moon_axis = new THREE.Vector3(Math.sin(MOON_ANGLE / 45 * Math.PI), 0,Math.cos(MOON_ANGLE / 45 * Math.PI));//月球自转轴
+        const sun_axis = new THREE.Vector3(Math.sin(SUN_ANGLE / 180 * Math.PI), 0,Math.cos(SUN_ANGLE / 180 * Math.PI));//太阳自转轴
+        const earth_axis = new THREE.Vector3(Math.sin(EARTH_ANGLE / 180 * Math.PI), 0 ,Math.cos(EARTH_ANGLE / 180 * Math.PI));//地球自转轴
+        const moon_axis = new THREE.Vector3(Math.sin(MOON_ANGLE / 180 * Math.PI), 0,Math.cos(MOON_ANGLE / 180 * Math.PI));//月球自转轴
 
         //动画
         const animate = function () {
