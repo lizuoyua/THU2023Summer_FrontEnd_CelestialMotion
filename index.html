@@ -69,7 +69,7 @@
             const main_camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1 ,10000);//初始化主摄像机
             const camera_at_sun = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 8, 1000);//初始化聚焦太阳的摄像机
             const camera_at_moon = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 8, 1000);//初始化聚焦月球的摄像机
-            main_camera.position.z = 1200;//设置主摄像机位置
+            main_camera.position.z = 1300;//设置主摄像机位置
             const renderer = new THREE.WebGLRenderer({antialias: true});//初始化渲染器，开启抗锯齿
             renderer.shadowMap.enabled = true;//开启阴影
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -299,16 +299,18 @@
             //添加视图选择监听
             select_view_method_element.addEventListener('change', (event) => {
                 if(event.target.value == 'front_view'){
-                    main_camera.position.set(0, 0, 1200);
+                    main_camera.position.set(0, 0, 1300);
                     main_camera.lookAt(new THREE.Vector3(0, 0, 0));
                     orbitControls.enabled = false;
                 }
                 else if(event.target.value == 'side_view'){
-                    main_camera.position.set(0, 1200, 0);
+                    main_camera.position.set(0, 1300, 0);
                     main_camera.lookAt(new THREE.Vector3(0, 0, 0));
                     orbitControls.enabled = false;
                 }
                 else{
+                    main_camera.position.set(0, 0, 1300);
+                    main_camera.lookAt(new THREE.Vector3(0, 0, 0));
                     orbitControls.enabled = true;
                 }
             })
