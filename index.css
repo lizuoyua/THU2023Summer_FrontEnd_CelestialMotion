@@ -13,6 +13,12 @@ img{
     z-index: 1;
 }
 
+#earth_skin{
+    position: absolute;
+    z-index: 1;
+    left: 80px;
+}
+
 #solar_eclipse_label{
     position: absolute;
     top: 30px;

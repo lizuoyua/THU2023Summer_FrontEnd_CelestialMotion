@@ -21,6 +21,10 @@
         <option value="side_view">侧视图</option>
         <option value="3D">3D</option>
     </select>
+    <select id="earth_skin">
+        <option value="satellit_imagery">卫星图</option>
+        <option value="map">地图</option>
+    </select>
     <label id="solar_eclipse_label">日食</label>
     <ul id="solar_eclipse">
         <img src="./images/日全食.png">
@@ -99,8 +103,8 @@
             };
     
             // 加载太阳背景图像
-            const sun_backgroud_texture = loader.load('./images/sun.jpeg');
-            const sun_material = new THREE.MeshBasicMaterial({ map: sun_backgroud_texture });
+            const sun_background_texture = loader.load('./images/sun.jpeg');
+            const sun_material = new THREE.MeshBasicMaterial({ map: sun_background_texture });
     
             //创建太阳
             const sun = createSphereGeometry({
@@ -109,9 +113,13 @@
                 position: [0, 0, 0]
             });
     
-            // 加载地球背景图像
-            const earth_backgroud_texture = loader.load('./images/earth.jpg'); 
-            const earth_material = new THREE.MeshStandardMaterial({ map: earth_backgroud_texture });
+            // 加载地球卫星图背景图像
+            const earth_background_texture = loader.load('./images/earth.jpg'); 
+            const earth_material = new THREE.MeshStandardMaterial({ map: earth_background_texture });
+
+            //加载地球地图背景图像
+            const earth_map_background_texture = loader.load('./images/earth_map.jfif');
+            const earth_map_material = new THREE.MeshStandardMaterial({ map: earth_map_background_texture});
     
             //创建地球
             const earth = createSphereGeometry({
@@ -124,8 +132,8 @@
             earth.receiveShadow = true;
     
             // 加载月球背景图像
-            const moon_backgroud_texture = loader.load('./images/moon.jpg'); 
-            const moon_material = new THREE.MeshStandardMaterial({ map: moon_backgroud_texture });
+            const moon_background_texture = loader.load('./images/moon.jpg'); 
+            const moon_material = new THREE.MeshStandardMaterial({ map: moon_background_texture });
     
             //创建月球
             const moon = createSphereGeometry({
@@ -210,12 +218,13 @@
             const earth_axis = new THREE.Vector3(Math.sin(EARTH_ANGLE / 180 * Math.PI), 0 ,Math.cos(EARTH_ANGLE / 180 * Math.PI));//地球自转轴
             const moon_axis = new THREE.Vector3(Math.sin(MOON_ANGLE / 180 * Math.PI), 0,Math.cos(MOON_ANGLE / 180 * Math.PI));//月球自转轴
     
-            //动画
+            //更新
             let require_id_animate;
 
             let current_time = 0;
             let stopped_time = 0;
 
+            //更新动画
             const animate = function () {
                 let time = Math.floor(performance.now());
                 time = time / 1000;
@@ -238,6 +247,7 @@
             };
             animate();
 
+            //更新渲染器
             const update_renderer = function () {
                 renderer.clear();
                 renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
@@ -302,6 +312,19 @@
                     orbitControls.enabled = true;
                 }
             })
+
+            const select_earth_skin_element = document.querySelector('#earth_skin');
+
+            //添加换肤选择监听
+            select_earth_skin_element.addEventListener('change', (event) => {
+                if(event.target.value == 'satellit_imagery'){
+                    earth.material.copy(earth_material);
+                }
+                else{
+                    earth.material.copy(earth_map_material);
+                }
+            });
+
 
             //自适应窗口大小
             window.onresize = function(){
