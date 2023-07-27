@@ -197,24 +197,36 @@
             const moon_axis = new THREE.Vector3(Math.sin(MOON_ANGLE / 180 * Math.PI), 0,Math.cos(MOON_ANGLE / 180 * Math.PI));//月球自转轴
     
             //动画
+            let require_id_animate;
+
+            let current_time = 0;
+            let stopped_time = 0;
+
+            //更新坐标
             const animate = function () {
                 let time = Math.floor(performance.now());
                 time = time / 1000;
-                let t_earth_orbit = time % EARTH_ORBIT_TIME / EARTH_ORBIT_TIME;
-                let t_moon_orbit = time % MOON_ORBIT_TIME / MOON_ORBIT_TIME;
+                current_time = time;
+                let t_earth_orbit = (time - stopped_time) % EARTH_ORBIT_TIME / EARTH_ORBIT_TIME;
+                let t_moon_orbit = (time - stopped_time) % MOON_ORBIT_TIME / MOON_ORBIT_TIME;
                 let earth_position_2d = earth_orbit.getPointAt(t_earth_orbit);
                 let earth_position = new THREE.Vector3(earth_position_2d.x, earth_position_2d.y, 0);
                 earth.position.copy(earth_position);//更新地球坐标
                 moon_orbit_object.position.copy(earth_position);//更新月球轨道坐标
                 moon.position.addVectors(earth_position, moon_orbit.getPointAt(t_moon_orbit));//更新月球坐标
-                sun.setRotationFromAxisAngle(sun_axis, 2*Math.PI *(time % SUN_TIME) / SUN_TIME);//更新太阳自转角度
-                earth.setRotationFromAxisAngle(earth_axis, 2*Math.PI *(time % EARTH_TIME) / EARTH_TIME);//更新地球自转角度
-                moon.setRotationFromAxisAngle(moon_axis, 2*Math.PI *(time % MOON_TIME) / MOON_TIME);//更新月球自转角度
+                sun.setRotationFromAxisAngle(sun_axis, 2*Math.PI *((time - stopped_time) % SUN_TIME) / SUN_TIME);//更新太阳自转角度
+                earth.setRotationFromAxisAngle(earth_axis, 2*Math.PI *((time - stopped_time) % EARTH_TIME) / EARTH_TIME);//更新地球自转角度
+                moon.setRotationFromAxisAngle(moon_axis, 2*Math.PI *((time - stopped_time) % MOON_TIME) / MOON_TIME);//更新月球自转角度
                 camera_at_sun.position.copy(earth_position);//更新相机坐标
                 camera_at_sun.lookAt(sun.position);
                 camera_at_moon.position.copy(earth_position);//更新相机坐标
                 camera_at_moon.lookAt(moon.position);
-                requestAnimationFrame(animate);
+                require_id_animate = requestAnimationFrame(animate);
+            };
+            animate();
+
+            //更新渲染
+            const update_renderer = function () {
                 renderer.clear();
                 renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
                 renderer.render(scene, main_camera);
@@ -222,8 +234,40 @@
                 renderer.render(scene, camera_at_sun);
                 renderer.setViewport(0, 220, 320, 180);
                 renderer.render(scene, camera_at_moon);
+                requestAnimationFrame(update_renderer);
             };
-            animate();
+            update_renderer();
+
+            let require_id_time
+            
+            //计算暂停时间
+            const figure_stopped_time = function () {
+                let time = Math.floor(performance.now());
+                time = time / 1000;
+                stopped_time += time - current_time;
+                current_time = time;
+                require_id_time = requestAnimationFrame(figure_stopped_time);
+            };
+
+            let stopped = false;
+
+            //暂停和播放功能
+            const element = document.body;
+            element.onkeypress = press;
+            function press(event){
+                if(event.keyCode == 32){
+                    if(stopped){
+                        animate();
+                        cancelAnimationFrame(require_id_time);
+                        stopped = false;
+                    }
+                    else{
+                        cancelAnimationFrame(require_id_animate);
+                        figure_stopped_time();
+                        stopped = true;
+                    }
+                }
+            }
     
             //初始化视图
             orbitControls.enabled = false;

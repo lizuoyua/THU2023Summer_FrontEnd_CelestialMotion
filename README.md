@@ -3,6 +3,8 @@ THU Web front-end course team assignment in 2023
 
 using threejs
 
+按space暂停
+
 由于在html中使用type="module"引入js会产生跨域问题（该问题是由于同源策略产生的，建一个本地服务器就可以解决，但是这次项目只需要前端，不需要服务器，所以我没有建）
 
 故需要以下两种解决方案之一
