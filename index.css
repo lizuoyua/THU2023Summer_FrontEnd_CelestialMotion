@@ -3,12 +3,52 @@ body{
     min-height: 450px;
 }
 
+img{
+    width: 100px;
+    height: 100px;
+}
+
 #view_method{
     position: absolute;
     z-index: 1;
 }
 
-#main_canvas{
+#solar_eclipse_label{
     position: absolute;
+    top: 30px;
+    color: white;
+    font-size: 24px;
+    z-index: 1;
+}
+
+#solar_eclipse{
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 60px;
+    z-index: 1;
+}
+
+#moon_eclipse_label{
+    position: absolute;
+    top: 160px;
+    color: white;
+    font-size: 24px;
+    z-index: 1;
+}
+
+#moon_eclipse{
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 190px;
+    z-index: 1;
+}
+
+#main_canvas{
+    position: fixed;
+    top: 0;
+    left: 0;
     z-index: 0;
 }
+

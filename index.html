@@ -21,6 +21,18 @@
         <option value="side_view">侧视图</option>
         <option value="3D">3D</option>
     </select>
+    <label id="solar_eclipse_label">日食</label>
+    <ul id="solar_eclipse">
+        <img src="./images/日全食.png">
+        <img src="./images/日偏食.png">
+        <img src="./images/日环食.png">
+    </ul>
+    <label id="moon_eclipse_label">月食</label>
+    <ul id="moon_eclipse">
+        <img src="./images/月全食.png">
+        <img src="./images/月偏食.png">
+        <img src="./images/月环食.png">
+    </ul>
     <div id="main_canvas">
         <script type="module">
             import * as THREE from 'three';
@@ -70,6 +82,8 @@
             point_light.intensity = 3;
             point_light.position.set(0, 0, 0);
             point_light.castShadow = true;
+            point_light.shadow.mapSize.width = 2048;
+            point_light.shadow.mapSize.height = 2048;
             scene.add(point_light);
             
             //// 加载图像作为背景
@@ -202,7 +216,6 @@
             let current_time = 0;
             let stopped_time = 0;
 
-            //更新坐标
             const animate = function () {
                 let time = Math.floor(performance.now());
                 time = time / 1000;
@@ -225,7 +238,6 @@
             };
             animate();
 
-            //更新渲染
             const update_renderer = function () {
                 renderer.clear();
                 renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
