@@ -11,6 +11,7 @@ using threejs
 
 1、
 在vscode中下载live server插件，在vscode视图中右键单击index.html文件，选择open with live server打开。
+liver server设置参考https://blog.csdn.net/weixin_43272781/article/details/103875811
 
 2、
 找到chrome.exe的目录文件夹，打开cmd，输入chrome.exe --disable-web-security --user-data-dir=D:\MyChromeUserData打开chrome，得到一个关闭了同源策略的chrome页面，
