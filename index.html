@@ -332,6 +332,8 @@
             window.onresize = function(){
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 main_camera.aspect = window.innerWidth / window.innerHeight;
+                camera_at_moon.aspect = window.innerWidth / window.innerHeight;
+                camera_at_sun.aspect = window.innerWidth / window.innerHeight;
                 main_camera.updateProjectionMatrix();
             }
     
