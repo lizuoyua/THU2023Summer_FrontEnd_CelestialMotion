@@ -115,11 +115,7 @@
     
             // 加载地球卫星图背景图像
             const earth_background_texture = loader.load('./images/earth.jpg'); 
-            const earth_material = new THREE.MeshStandardMaterial({ map: earth_background_texture });
-
-            //加载地球地图背景图像
-            const earth_map_background_texture = loader.load('./images/earth_map.jfif');
-            const earth_map_material = new THREE.MeshStandardMaterial({ map: earth_map_background_texture});
+            const earth_material = new THREE.MeshStandardMaterial({ map: earth_background_texture });            
     
             //创建地球
             const earth = createSphereGeometry({
@@ -132,8 +128,8 @@
             earth.receiveShadow = true;
     
             // 加载月球背景图像
-            const moon_background_texture = loader.load('./images/moon.jpg'); 
-            const moon_material = new THREE.MeshStandardMaterial({ map: moon_background_texture });
+            var moon_background_texture = loader.load('./images/moon.jpg'); 
+            var moon_material = new THREE.MeshStandardMaterial({ map: moon_background_texture });
     
             //创建月球
             const moon = createSphereGeometry({
@@ -313,17 +309,21 @@
                     main_camera.lookAt(new THREE.Vector3(0, 0, 0));
                     orbitControls.enabled = true;
                 }
-            })
+            });
 
             const select_earth_skin_element = document.querySelector('#earth_skin');
 
             //添加换肤选择监听
             select_earth_skin_element.addEventListener('change', (event) => {
-                if(event.target.value == 'satellit_imagery'){
-                    earth.material.copy(earth_material);
+                if(event.target.value == 'map'){
+                    var earth_map_background_texture = loader.load('./images/earth_map.jfif');
+                    var earth_map_material = new THREE.MeshStandardMaterial({ map: earth_map_background_texture});
+                    earth.material.copy(earth_map_material);
                 }
                 else{
-                    earth.material.copy(earth_map_material);
+                    var earth_background_texture = loader.load('./images/earth.jpg'); 
+                    var earth_material = new THREE.MeshStandardMaterial({ map: earth_background_texture });
+                    earth.material.copy(earth_material);
                 }
             });
 
